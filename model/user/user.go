@@ -7,13 +7,12 @@ import (
 
 type User struct {
 	gorm.Model
-	Name     string
-	Password string
-	Key      int
-	Code     string
+	Code     string `json:"code"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+	Token    string `json:"token"`
 }
 
-// Connect .
 func Connect() *gorm.DB {
 	db, err := gorm.Open("sqlite3", "test.sqlite3")
 	if err != nil {

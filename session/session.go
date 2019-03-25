@@ -2,6 +2,9 @@ package session
 
 import (
 	"fmt"
+	"keep-server/utill/hash"
+	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -33,4 +36,22 @@ func Get(id string) string {
 		return ""
 	}
 	return s.key
+}
+
+func GenSession(code string) string {
+	rand.Seed(time.Now().UnixNano())
+	sessionKey := hash.Sha1(strconv.Itoa(rand.Int()))
+	Set(code, sessionKey)
+
+	return sessionKey
+}
+
+func IsLogin(code string, token string) bool {
+	sessionKey := Get(code)
+	fmt.Println("islogin:", sessionKey, token)
+
+	if sessionKey == token {
+		return true
+	}
+	return false
 }
