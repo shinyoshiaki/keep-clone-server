@@ -12,7 +12,7 @@ type GetAllMemo struct {
 }
 
 type GetUser struct {
-	Code     string `json:"code"`
+	Name     string `json:"name"`
 	Password string `json:"password"`
 }
 

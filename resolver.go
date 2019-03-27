@@ -86,9 +86,9 @@ type queryResolver struct{ *Resolver }
 
 func (r *queryResolver) GetUser(ctx context.Context, input GetUser) (*User, error) {
 	var u User
-	userDB.Find(&u, "Code = ?", input.Code)
+	userDB.Find(&u, "Name = ?", input.Name)
 
-	sessionKey := session.GenSession(input.Code)
+	sessionKey := session.GenSession(u.Code)
 
 	u.Token = sessionKey
 

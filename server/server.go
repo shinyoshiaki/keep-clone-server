@@ -6,7 +6,9 @@ import (
 	"net/http"
 
 	"github.com/99designs/gqlgen/handler"
+	"github.com/gorilla/mux"
 	"github.com/mitchellh/go-homedir"
+	"github.com/rs/cors"
 )
 
 const defaultPort = "1333"
@@ -14,14 +16,19 @@ const defaultPort = "1333"
 func main() {
 	port := defaultPort
 
-	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
-	http.Handle("/query", handler.GraphQL(keep_server.NewExecutableSchema(keep_server.Config{Resolvers: &keep_server.Resolver{}})))
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+	})
+
+	router := mux.NewRouter()
+	router.HandleFunc("/", handler.Playground("GraphQL playground", "/query"))
+	router.HandleFunc("/graphql", handler.GraphQL(keep_server.NewExecutableSchema(keep_server.Config{Resolvers: &keep_server.Resolver{}})))
+	router.HandleFunc("/query", handler.GraphQL(keep_server.NewExecutableSchema(keep_server.Config{Resolvers: &keep_server.Resolver{}})))
 
 	home, _ := homedir.Dir()
 
-	err := http.ListenAndServeTLS(":"+port, home+"/ssl/myself.crt", home+"/ssl/myself.key", nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+	if err := http.ListenAndServeTLS(":"+port, home+"/ssl/myself.crt", home+"/ssl/myself.key", c.Handler(router)); err != nil {
+		log.Fatal("err", err)
 	}
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)

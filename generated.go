@@ -333,7 +333,7 @@ type Mutation {
 }
 
 input GetUser {
-  code: String!
+  name: String!
   password: String!
 }
 
@@ -362,7 +362,7 @@ func (ec *executionContext) field_Mutation_createMemo_args(ctx context.Context, 
 	args := map[string]interface{}{}
 	var arg0 NewMemo
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNNewMemo2gqlgenᚑtodosᚐNewMemo(ctx, tmp)
+		arg0, err = ec.unmarshalNNewMemo2keepᚑserverᚐNewMemo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -376,7 +376,7 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	args := map[string]interface{}{}
 	var arg0 NewUser
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNNewUser2gqlgenᚑtodosᚐNewUser(ctx, tmp)
+		arg0, err = ec.unmarshalNNewUser2keepᚑserverᚐNewUser(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -404,7 +404,7 @@ func (ec *executionContext) field_Query_getAllMemo_args(ctx context.Context, raw
 	args := map[string]interface{}{}
 	var arg0 GetAllMemo
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNGetAllMemo2gqlgenᚑtodosᚐGetAllMemo(ctx, tmp)
+		arg0, err = ec.unmarshalNGetAllMemo2keepᚑserverᚐGetAllMemo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -418,7 +418,7 @@ func (ec *executionContext) field_Query_getUser_args(ctx context.Context, rawArg
 	args := map[string]interface{}{}
 	var arg0 GetUser
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNGetUser2gqlgenᚑtodosᚐGetUser(ctx, tmp)
+		arg0, err = ec.unmarshalNGetUser2keepᚑserverᚐGetUser(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -480,7 +480,7 @@ func (ec *executionContext) _AllMemo_memos(ctx context.Context, field graphql.Co
 	res := resTmp.([]Memo)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOMemo2ᚕgqlgenᚑtodosᚐMemo(ctx, field.Selections, res)
+	return ec.marshalOMemo2ᚕkeepᚑserverᚐMemo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Memo_owner(ctx context.Context, field graphql.CollectedField, obj *Memo) graphql.Marshaler {
@@ -676,7 +676,7 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 	res := resTmp.(*User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNUser2ᚖgqlgenᚑtodosᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖkeepᚑserverᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createMemo(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -710,7 +710,7 @@ func (ec *executionContext) _Mutation_createMemo(ctx context.Context, field grap
 	res := resTmp.(*Memo)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNMemo2ᚖgqlgenᚑtodosᚐMemo(ctx, field.Selections, res)
+	return ec.marshalNMemo2ᚖkeepᚑserverᚐMemo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getUser(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -741,7 +741,7 @@ func (ec *executionContext) _Query_getUser(ctx context.Context, field graphql.Co
 	res := resTmp.(*User)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOUser2ᚖgqlgenᚑtodosᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖkeepᚑserverᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getAllMemo(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -772,7 +772,7 @@ func (ec *executionContext) _Query_getAllMemo(ctx context.Context, field graphql
 	res := resTmp.(*AllMemo)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOAllMemo2ᚖgqlgenᚑtodosᚐAllMemo(ctx, field.Selections, res)
+	return ec.marshalOAllMemo2ᚖkeepᚑserverᚐAllMemo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -1799,9 +1799,9 @@ func (ec *executionContext) unmarshalInputGetUser(ctx context.Context, v interfa
 
 	for k, v := range asMap {
 		switch k {
-		case "code":
+		case "name":
 			var err error
-			it.Code, err = ec.unmarshalNString2string(ctx, v)
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2350,19 +2350,19 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return graphql.MarshalBoolean(v)
 }
 
-func (ec *executionContext) unmarshalNGetAllMemo2gqlgenᚑtodosᚐGetAllMemo(ctx context.Context, v interface{}) (GetAllMemo, error) {
+func (ec *executionContext) unmarshalNGetAllMemo2keepᚑserverᚐGetAllMemo(ctx context.Context, v interface{}) (GetAllMemo, error) {
 	return ec.unmarshalInputGetAllMemo(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNGetUser2gqlgenᚑtodosᚐGetUser(ctx context.Context, v interface{}) (GetUser, error) {
+func (ec *executionContext) unmarshalNGetUser2keepᚑserverᚐGetUser(ctx context.Context, v interface{}) (GetUser, error) {
 	return ec.unmarshalInputGetUser(ctx, v)
 }
 
-func (ec *executionContext) marshalNMemo2gqlgenᚑtodosᚐMemo(ctx context.Context, sel ast.SelectionSet, v Memo) graphql.Marshaler {
+func (ec *executionContext) marshalNMemo2keepᚑserverᚐMemo(ctx context.Context, sel ast.SelectionSet, v Memo) graphql.Marshaler {
 	return ec._Memo(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNMemo2ᚖgqlgenᚑtodosᚐMemo(ctx context.Context, sel ast.SelectionSet, v *Memo) graphql.Marshaler {
+func (ec *executionContext) marshalNMemo2ᚖkeepᚑserverᚐMemo(ctx context.Context, sel ast.SelectionSet, v *Memo) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2372,11 +2372,11 @@ func (ec *executionContext) marshalNMemo2ᚖgqlgenᚑtodosᚐMemo(ctx context.Co
 	return ec._Memo(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNNewMemo2gqlgenᚑtodosᚐNewMemo(ctx context.Context, v interface{}) (NewMemo, error) {
+func (ec *executionContext) unmarshalNNewMemo2keepᚑserverᚐNewMemo(ctx context.Context, v interface{}) (NewMemo, error) {
 	return ec.unmarshalInputNewMemo(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNNewUser2gqlgenᚑtodosᚐNewUser(ctx context.Context, v interface{}) (NewUser, error) {
+func (ec *executionContext) unmarshalNNewUser2keepᚑserverᚐNewUser(ctx context.Context, v interface{}) (NewUser, error) {
 	return ec.unmarshalInputNewUser(ctx, v)
 }
 
@@ -2417,11 +2417,11 @@ func (ec *executionContext) marshalNString2ᚕstring(ctx context.Context, sel as
 	return ret
 }
 
-func (ec *executionContext) marshalNUser2gqlgenᚑtodosᚐUser(ctx context.Context, sel ast.SelectionSet, v User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2keepᚑserverᚐUser(ctx context.Context, sel ast.SelectionSet, v User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚖgqlgenᚑtodosᚐUser(ctx context.Context, sel ast.SelectionSet, v *User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖkeepᚑserverᚐUser(ctx context.Context, sel ast.SelectionSet, v *User) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2645,11 +2645,11 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return graphql.MarshalString(v)
 }
 
-func (ec *executionContext) marshalOAllMemo2gqlgenᚑtodosᚐAllMemo(ctx context.Context, sel ast.SelectionSet, v AllMemo) graphql.Marshaler {
+func (ec *executionContext) marshalOAllMemo2keepᚑserverᚐAllMemo(ctx context.Context, sel ast.SelectionSet, v AllMemo) graphql.Marshaler {
 	return ec._AllMemo(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOAllMemo2ᚖgqlgenᚑtodosᚐAllMemo(ctx context.Context, sel ast.SelectionSet, v *AllMemo) graphql.Marshaler {
+func (ec *executionContext) marshalOAllMemo2ᚖkeepᚑserverᚐAllMemo(ctx context.Context, sel ast.SelectionSet, v *AllMemo) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -2679,7 +2679,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalOMemo2ᚕgqlgenᚑtodosᚐMemo(ctx context.Context, sel ast.SelectionSet, v []Memo) graphql.Marshaler {
+func (ec *executionContext) marshalOMemo2ᚕkeepᚑserverᚐMemo(ctx context.Context, sel ast.SelectionSet, v []Memo) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -2706,7 +2706,7 @@ func (ec *executionContext) marshalOMemo2ᚕgqlgenᚑtodosᚐMemo(ctx context.Co
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNMemo2gqlgenᚑtodosᚐMemo(ctx, sel, v[i])
+			ret[i] = ec.marshalNMemo2keepᚑserverᚐMemo(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2742,11 +2742,11 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return ec.marshalOString2string(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalOUser2gqlgenᚑtodosᚐUser(ctx context.Context, sel ast.SelectionSet, v User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2keepᚑserverᚐUser(ctx context.Context, sel ast.SelectionSet, v User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalOUser2ᚖgqlgenᚑtodosᚐUser(ctx context.Context, sel ast.SelectionSet, v *User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2ᚖkeepᚑserverᚐUser(ctx context.Context, sel ast.SelectionSet, v *User) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
