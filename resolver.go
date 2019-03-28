@@ -6,7 +6,6 @@ import (
 	"keep-server/model/user"
 	"keep-server/session"
 	"keep-server/utill/hash"
-	"log"
 	"math/rand"
 	"strconv"
 	"time"
@@ -54,7 +53,8 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input NewUser) (*User
 }
 
 func (r *mutationResolver) CreateMemo(ctx context.Context, input NewMemo) (*Memo, error) {
-	if session.IsLogin(input.Owner, input.Token) == false {
+	owner := session.IsLogin(input.Token)
+	if owner == "" {
 		return nil, nil
 	}
 
@@ -69,7 +69,7 @@ func (r *mutationResolver) CreateMemo(ctx context.Context, input NewMemo) (*Memo
 	hash := hash.Sha1(input.Title + input.Text + tag)
 
 	memo := &Memo{
-		Owner: input.Owner,
+		Owner: owner,
 		Code:  code,
 		Hash:  hash,
 		Title: input.Title,
@@ -99,14 +99,13 @@ func (r *queryResolver) GetUser(ctx context.Context, input GetUser) (*User, erro
 }
 
 func (r *queryResolver) GetAllMemo(ctx context.Context, input GetAllMemo) (*AllMemo, error) {
-	if session.IsLogin(input.Owner, input.Token) == false {
+	owner := session.IsLogin(input.Token)
+	if owner == "" {
 		return nil, nil
 	}
 
 	var memos []Memo
-	memoDB.Find(&memos, "Owner = ?", input.Owner)
-
-	log.Println("memos", memos)
+	memoDB.Find(&memos, "Owner = ?", owner)
 
 	a := &AllMemo{
 		Memos: memos,

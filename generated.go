@@ -320,7 +320,6 @@ type Memo {
 }
 
 input NewMemo {
-  owner: String!
   token: String!
   title: String!
   text: String!
@@ -338,7 +337,6 @@ input GetUser {
 }
 
 input GetAllMemo {
-  owner: String!
   token: String!
 }
 
@@ -1775,12 +1773,6 @@ func (ec *executionContext) unmarshalInputGetAllMemo(ctx context.Context, v inte
 
 	for k, v := range asMap {
 		switch k {
-		case "owner":
-			var err error
-			it.Owner, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "token":
 			var err error
 			it.Token, err = ec.unmarshalNString2string(ctx, v)
@@ -1823,12 +1815,6 @@ func (ec *executionContext) unmarshalInputNewMemo(ctx context.Context, v interfa
 
 	for k, v := range asMap {
 		switch k {
-		case "owner":
-			var err error
-			it.Owner, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "token":
 			var err error
 			it.Token, err = ec.unmarshalNString2string(ctx, v)

@@ -10,23 +10,23 @@ import (
 
 type (
 	session struct {
-		key  string
 		time time.Time
+		code string
 	}
 )
 
 var sessions = map[string]*session{}
 
-func Set(id string, key string) {
+func Set(token string, code string) {
 	s := &session{
-		key:  key,
 		time: time.Now().Add(time.Hour * 1),
+		code: code,
 	}
-	sessions[id] = s
+	sessions[token] = s
 }
 
-func Get(id string) string {
-	s := sessions[id]
+func Get(token string) string {
+	s := sessions[token]
 	if s == nil {
 		fmt.Println("session null")
 		return ""
@@ -35,23 +35,22 @@ func Get(id string) string {
 		fmt.Println("session timeout")
 		return ""
 	}
-	return s.key
+	return s.code
 }
 
 func GenSession(code string) string {
 	rand.Seed(time.Now().UnixNano())
 	sessionKey := hash.Sha1(strconv.Itoa(rand.Int()))
-	Set(code, sessionKey)
+	Set(sessionKey, code)
 
 	return sessionKey
 }
 
-func IsLogin(code string, token string) bool {
-	sessionKey := Get(code)
-	fmt.Println("islogin:", sessionKey, token)
+func IsLogin(token string) string {
+	code := Get(token)
 
-	if sessionKey == token {
-		return true
+	if code != "" {
+		return code
 	}
-	return false
+	return ""
 }

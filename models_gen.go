@@ -7,7 +7,6 @@ type AllMemo struct {
 }
 
 type GetAllMemo struct {
-	Owner string `json:"owner"`
 	Token string `json:"token"`
 }
 
@@ -26,7 +25,6 @@ type Memo struct {
 }
 
 type NewMemo struct {
-	Owner string   `json:"owner"`
 	Token string   `json:"token"`
 	Title string   `json:"title"`
 	Text  string   `json:"text"`
