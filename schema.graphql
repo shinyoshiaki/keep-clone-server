@@ -1,0 +1,50 @@
+type User {
+  code: String!
+  name: String!
+  password: String!
+  token: String!
+}
+
+input NewUser {
+  name: String!
+  password: String!
+}
+
+type Memo {
+  owner: String!
+  code: String!
+  hash: String!
+  title: String!
+  text: String!
+  tag: String!
+}
+
+input NewMemo {
+  token: String!
+  title: String!
+  text: String!
+  tag: [String!]!
+}
+
+type Mutation {
+  createUser(input: NewUser!): User!
+  createMemo(input: NewMemo!): Memo!
+}
+
+input GetUser {
+  name: String!
+  password: String!
+}
+
+input GetAllMemo {
+  token: String!
+}
+
+type AllMemo {
+  memos: [Memo!]
+}
+
+type Query {
+  getUser(input: GetUser!): User
+  getAllMemo(input: GetAllMemo!): AllMemo
+}

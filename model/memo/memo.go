@@ -7,6 +7,7 @@ import (
 
 type Memo struct {
 	gorm.Model
+	Owner string `json:"owner"`
 	Code  string `json:"code"`
 	Hash  string `json:"hash"`
 	Title string `json:"title"`
