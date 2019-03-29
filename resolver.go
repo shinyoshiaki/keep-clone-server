@@ -30,6 +30,12 @@ func (r *Resolver) Query() QueryResolver {
 type mutationResolver struct{ *Resolver }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input NewUser) (*User, error) {
+	var u User
+	userDB.Find(u, "Name = ?", input.Name)
+	if u.Name != "" {
+		return nil, nil
+	}
+
 	count := 0
 	users := []user.User{}
 	userDB.Find(&users).Count(&count)
