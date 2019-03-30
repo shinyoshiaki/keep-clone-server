@@ -6,6 +6,7 @@ import (
 	"keep-server/model/user"
 	"keep-server/session"
 	"keep-server/utill/hash"
+	"log"
 	"math/rand"
 	"strconv"
 	"time"
@@ -112,6 +113,8 @@ func (r *queryResolver) GetAllMemo(ctx context.Context, input GetAllMemo) (*AllM
 
 	var memos []Memo
 	memoDB.Find(&memos, "Owner = ?", owner)
+
+	log.Println(memos)
 
 	a := &AllMemo{
 		Memos: memos,
