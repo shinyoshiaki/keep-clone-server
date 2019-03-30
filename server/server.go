@@ -27,6 +27,8 @@ func main() {
 
 	home, _ := homedir.Dir()
 
+	log.Println("home", home)
+
 	if err := http.ListenAndServeTLS(":"+port, home+"/ssl/myself.crt", home+"/ssl/myself.key", c.Handler(router)); err != nil {
 		log.Fatal("err", err)
 	}
