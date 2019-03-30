@@ -6,6 +6,7 @@ import (
 	"keep-server/model/user"
 	"keep-server/session"
 	"keep-server/utill/hash"
+	"log"
 	"math/rand"
 	"strconv"
 	"time"
@@ -72,18 +73,48 @@ func (r *mutationResolver) CreateMemo(ctx context.Context, input NewMemo) (*Memo
 		tag += v + ","
 	}
 
-	hash := hash.Sha1(input.Title + input.Text + tag)
-
 	memo := &Memo{
 		Owner: owner,
 		Code:  code,
-		Hash:  hash,
+		Time:  strconv.FormatInt(time.Now().UTC().Unix(), 10),
 		Title: input.Title,
 		Text:  input.Text,
 		Tag:   tag,
 	}
 
 	memoDB.Create(memo)
+
+	return memo, nil
+}
+
+func (r *mutationResolver) EditMemo(ctx context.Context, input EditMemo) (*Memo, error) {
+	owner := session.IsLogin(input.Token)
+	if owner == "" {
+		return nil, nil
+	}
+
+	var m Memo
+	memoDB.Find(&m, "Code = ?", input.MemoCode)
+
+	if m.Owner != owner {
+		return nil, nil
+	}
+
+	tag := ""
+	for _, v := range input.Tag {
+		tag += v + ","
+	}
+
+	memo := &Memo{
+		Owner: owner,
+		Code:  input.MemoCode,
+		Time:  strconv.FormatInt(time.Now().UTC().Unix(), 10),
+		Title: input.Title,
+		Text:  input.Text,
+		Tag:   tag,
+	}
+
+	memoDB.Model(&m).Update(memo)
 
 	return memo, nil
 }
@@ -112,6 +143,8 @@ func (r *queryResolver) GetAllMemo(ctx context.Context, input GetAllMemo) (*AllM
 
 	var memos []Memo
 	memoDB.Find(&memos, "Owner = ?", owner)
+
+	log.Println(memos)
 
 	a := &AllMemo{
 		Memos: memos,

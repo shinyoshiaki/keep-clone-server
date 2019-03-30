@@ -47,16 +47,17 @@ type ComplexityRoot struct {
 
 	Memo struct {
 		Code  func(childComplexity int) int
-		Hash  func(childComplexity int) int
 		Owner func(childComplexity int) int
 		Tag   func(childComplexity int) int
 		Text  func(childComplexity int) int
+		Time  func(childComplexity int) int
 		Title func(childComplexity int) int
 	}
 
 	Mutation struct {
 		CreateMemo func(childComplexity int, input NewMemo) int
 		CreateUser func(childComplexity int, input NewUser) int
+		EditMemo   func(childComplexity int, input EditMemo) int
 	}
 
 	Query struct {
@@ -75,6 +76,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateUser(ctx context.Context, input NewUser) (*User, error)
 	CreateMemo(ctx context.Context, input NewMemo) (*Memo, error)
+	EditMemo(ctx context.Context, input EditMemo) (*Memo, error)
 }
 type QueryResolver interface {
 	GetUser(ctx context.Context, input GetUser) (*User, error)
@@ -110,13 +112,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Memo.Code(childComplexity), true
 
-	case "Memo.Hash":
-		if e.complexity.Memo.Hash == nil {
-			break
-		}
-
-		return e.complexity.Memo.Hash(childComplexity), true
-
 	case "Memo.Owner":
 		if e.complexity.Memo.Owner == nil {
 			break
@@ -137,6 +132,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Memo.Text(childComplexity), true
+
+	case "Memo.Time":
+		if e.complexity.Memo.Time == nil {
+			break
+		}
+
+		return e.complexity.Memo.Time(childComplexity), true
 
 	case "Memo.Title":
 		if e.complexity.Memo.Title == nil {
@@ -168,6 +170,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(NewUser)), true
+
+	case "Mutation.EditMemo":
+		if e.complexity.Mutation.EditMemo == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_editMemo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EditMemo(childComplexity, args["input"].(EditMemo)), true
 
 	case "Query.GetAllMemo":
 		if e.complexity.Query.GetAllMemo == nil {
@@ -313,10 +327,10 @@ input NewUser {
 type Memo {
   owner: String!
   code: String!
-  hash: String!
   title: String!
   text: String!
   tag: String!
+  time: String!
 }
 
 input NewMemo {
@@ -326,9 +340,18 @@ input NewMemo {
   tag: [String!]!
 }
 
+input EditMemo {
+  token: String!
+  memoCode: String!
+  title: String!
+  text: String!
+  tag: [String!]!
+}
+
 type Mutation {
   createUser(input: NewUser!): User!
   createMemo(input: NewMemo!): Memo!
+  editMemo(input: EditMemo!): Memo!
 }
 
 input GetUser {
@@ -375,6 +398,20 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	var arg0 NewUser
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNNewUser2keepᚑserverᚐNewUser(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_editMemo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 EditMemo
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNEditMemo2keepᚑserverᚐEditMemo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -535,33 +572,6 @@ func (ec *executionContext) _Memo_code(ctx context.Context, field graphql.Collec
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Memo_hash(ctx context.Context, field graphql.CollectedField, obj *Memo) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object:   "Memo",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Hash, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Memo_title(ctx context.Context, field graphql.CollectedField, obj *Memo) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -643,6 +653,33 @@ func (ec *executionContext) _Memo_tag(ctx context.Context, field graphql.Collect
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Memo_time(ctx context.Context, field graphql.CollectedField, obj *Memo) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Memo",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Time, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
@@ -698,6 +735,40 @@ func (ec *executionContext) _Mutation_createMemo(ctx context.Context, field grap
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateMemo(rctx, args["input"].(NewMemo))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Memo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNMemo2ᚖkeepᚑserverᚐMemo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_editMemo(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_editMemo_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EditMemo(rctx, args["input"].(EditMemo))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1767,6 +1838,48 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputEditMemo(ctx context.Context, v interface{}) (EditMemo, error) {
+	var it EditMemo
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "memoCode":
+			var err error
+			it.MemoCode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "text":
+			var err error
+			it.Text, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "tag":
+			var err error
+			it.Tag, err = ec.unmarshalNString2ᚕstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputGetAllMemo(ctx context.Context, v interface{}) (GetAllMemo, error) {
 	var it GetAllMemo
 	var asMap = v.(map[string]interface{})
@@ -1922,11 +2035,6 @@ func (ec *executionContext) _Memo(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "hash":
-			out.Values[i] = ec._Memo_hash(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
 		case "title":
 			out.Values[i] = ec._Memo_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -1939,6 +2047,11 @@ func (ec *executionContext) _Memo(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "tag":
 			out.Values[i] = ec._Memo_tag(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "time":
+			out.Values[i] = ec._Memo_time(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -1975,6 +2088,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "createMemo":
 			out.Values[i] = ec._Mutation_createMemo(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "editMemo":
+			out.Values[i] = ec._Mutation_editMemo(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -2334,6 +2452,10 @@ func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interf
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
 	return graphql.MarshalBoolean(v)
+}
+
+func (ec *executionContext) unmarshalNEditMemo2keepᚑserverᚐEditMemo(ctx context.Context, v interface{}) (EditMemo, error) {
+	return ec.unmarshalInputEditMemo(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNGetAllMemo2keepᚑserverᚐGetAllMemo(ctx context.Context, v interface{}) (GetAllMemo, error) {

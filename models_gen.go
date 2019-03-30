@@ -6,6 +6,14 @@ type AllMemo struct {
 	Memos []Memo `json:"memos"`
 }
 
+type EditMemo struct {
+	Token    string   `json:"token"`
+	MemoCode string   `json:"memoCode"`
+	Title    string   `json:"title"`
+	Text     string   `json:"text"`
+	Tag      []string `json:"tag"`
+}
+
 type GetAllMemo struct {
 	Token string `json:"token"`
 }
@@ -18,10 +26,10 @@ type GetUser struct {
 type Memo struct {
 	Owner string `json:"owner"`
 	Code  string `json:"code"`
-	Hash  string `json:"hash"`
 	Title string `json:"title"`
 	Text  string `json:"text"`
 	Tag   string `json:"tag"`
+	Time  string `json:"time"`
 }
 
 type NewMemo struct {
