@@ -13,10 +13,10 @@ input NewUser {
 type Memo {
   owner: String!
   code: String!
-  hash: String!
   title: String!
   text: String!
   tag: String!
+  time: String!
 }
 
 input NewMemo {
@@ -26,9 +26,18 @@ input NewMemo {
   tag: [String!]!
 }
 
+input EditMemo {
+  token: String!
+  memoCode: String!
+  title: String!
+  text: String!
+  tag: [String!]!
+}
+
 type Mutation {
   createUser(input: NewUser!): User!
   createMemo(input: NewMemo!): Memo!
+  editMemo(input: EditMemo!): Memo!
 }
 
 input GetUser {
