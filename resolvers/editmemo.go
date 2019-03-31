@@ -1,8 +1,7 @@
-package keep_server
+package resolvers
 
 import (
-	"context"
-	keep_server "keep-server"
+	"keep-server/model"
 	"keep-server/model/memo"
 	"keep-server/session"
 	"strconv"
@@ -13,20 +12,19 @@ var (
 	db = memo.Connect()
 )
 
-type mutationResolver struct{ *keep_server.Resolver }
+func EditMemo(input model.EditMemo) *memo.Memo {
 
-func (r *mutationResolver) EditMemo(ctx context.Context, input EditMemo) (*Memo, error) {
 	owner := session.IsLogin(input.Token)
 	if owner == "" {
-		return nil, nil
+		return nil
 	}
 
 	memo := memo.Memo{}
-	memo.Code = input.MemoCode
-	memoDB.Find(&memo)
+	newMemo := memo
+	db.First(&newMemo, "Code = ?", input.MemoCode)
 
-	if memo.Owner != owner {
-		return nil, nil
+	if newMemo.Owner != owner {
+		return nil
 	}
 
 	tag := ""
@@ -34,21 +32,13 @@ func (r *mutationResolver) EditMemo(ctx context.Context, input EditMemo) (*Memo,
 		tag += v + ","
 	}
 
-	memo.Time = strconv.FormatInt(time.Now().UTC().Unix(), 10)
-	memo.Title = input.Title
-	memo.Text = input.Text
-	memo.Tag = tag
+	newMemo.Time = strconv.FormatInt(time.Now().UTC().Unix(), 10)
+	newMemo.Title = input.Title
+	newMemo.Text = input.Text
+	newMemo.Tag = tag
 
-	memoDB.Save(&memo)
+	db.Model(&memo).Update(&newMemo)
+	db.Save(&newMemo)
 
-	ans := &Memo{
-		Owner: memo.Owner,
-		Code:  memo.Code,
-		Time:  memo.Time,
-		Title: memo.Title,
-		Text:  memo.Text,
-		Tag:   tag,
-	}
-
-	return ans, nil
+	return &newMemo
 }

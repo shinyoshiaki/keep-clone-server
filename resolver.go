@@ -2,8 +2,10 @@ package keep_server
 
 import (
 	context "context"
+	"keep-server/model"
 	"keep-server/model/memo"
 	"keep-server/model/user"
+	"keep-server/resolvers"
 	"keep-server/session"
 	"keep-server/utill/hash"
 	"log"
@@ -88,30 +90,14 @@ func (r *mutationResolver) CreateMemo(ctx context.Context, input NewMemo) (*Memo
 }
 
 func (r *mutationResolver) EditMemo(ctx context.Context, input EditMemo) (*Memo, error) {
-	owner := session.IsLogin(input.Token)
-	if owner == "" {
-		return nil, nil
-	}
 
-	memo := memo.Memo{}
-	memo.Code = input.MemoCode
-	memoDB.Find(&memo)
-
-	if memo.Owner != owner {
-		return nil, nil
-	}
-
-	tag := ""
-	for _, v := range input.Tag {
-		tag += v + ","
-	}
-
-	memo.Time = strconv.FormatInt(time.Now().UTC().Unix(), 10)
-	memo.Title = input.Title
-	memo.Text = input.Text
-	memo.Tag = tag
-
-	memoDB.Save(&memo)
+	memo := resolvers.EditMemo(model.EditMemo{
+		input.Token,
+		input.MemoCode,
+		input.Title,
+		input.Text,
+		input.Tag,
+	})
 
 	return &Memo{
 		Owner: memo.Owner,
@@ -119,7 +105,7 @@ func (r *mutationResolver) EditMemo(ctx context.Context, input EditMemo) (*Memo,
 		Time:  memo.Time,
 		Title: memo.Title,
 		Text:  memo.Text,
-		Tag:   tag,
+		Tag:   memo.Tag,
 	}, nil
 }
 
@@ -155,4 +141,13 @@ func (r *queryResolver) GetAllMemo(ctx context.Context, input GetAllMemo) (*AllM
 	}
 
 	return a, nil
+}
+
+func (r *queryResolver) Auth(ctx context.Context, input Auth) (*string, error) {
+	owner := session.IsLogin(input.Token)
+	if owner == "" {
+		return nil, nil
+	}
+
+	return &owner, nil
 }

@@ -61,6 +61,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Auth       func(childComplexity int, input Auth) int
 		GetAllMemo func(childComplexity int, input GetAllMemo) int
 		GetUser    func(childComplexity int, input GetUser) int
 	}
@@ -81,6 +82,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	GetUser(ctx context.Context, input GetUser) (*User, error)
 	GetAllMemo(ctx context.Context, input GetAllMemo) (*AllMemo, error)
+	Auth(ctx context.Context, input Auth) (*string, error)
 }
 
 type executableSchema struct {
@@ -182,6 +184,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.EditMemo(childComplexity, args["input"].(EditMemo)), true
+
+	case "Query.Auth":
+		if e.complexity.Query.Auth == nil {
+			break
+		}
+
+		args, err := ec.field_Query_auth_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Auth(childComplexity, args["input"].(Auth)), true
 
 	case "Query.GetAllMemo":
 		if e.complexity.Query.GetAllMemo == nil {
@@ -367,9 +381,14 @@ type AllMemo {
   memos: [Memo!]
 }
 
+input Auth {
+  token: String!
+}
+
 type Query {
   getUser(input: GetUser!): User
   getAllMemo(input: GetAllMemo!): AllMemo
+  auth(input: Auth!): String
 }
 `},
 )
@@ -431,6 +450,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_auth_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 Auth
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNAuth2keepᚑserverᚐAuth(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -842,6 +875,37 @@ func (ec *executionContext) _Query_getAllMemo(ctx context.Context, field graphql
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOAllMemo2ᚖkeepᚑserverᚐAllMemo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_auth(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_auth_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Auth(rctx, args["input"].(Auth))
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -1838,6 +1902,24 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAuth(ctx context.Context, v interface{}) (Auth, error) {
+	var it Auth
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputEditMemo(ctx context.Context, v interface{}) (EditMemo, error) {
 	var it EditMemo
 	var asMap = v.(map[string]interface{})
@@ -2144,6 +2226,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_getAllMemo(ctx, field)
 				return res
 			})
+		case "auth":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_auth(ctx, field)
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -2445,6 +2538,10 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
+
+func (ec *executionContext) unmarshalNAuth2keepᚑserverᚐAuth(ctx context.Context, v interface{}) (Auth, error) {
+	return ec.unmarshalInputAuth(ctx, v)
+}
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)

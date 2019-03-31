@@ -53,7 +53,12 @@ type AllMemo {
   memos: [Memo!]
 }
 
+input Auth {
+  token: String!
+}
+
 type Query {
   getUser(input: GetUser!): User
   getAllMemo(input: GetAllMemo!): AllMemo
+  auth(input: Auth!): String
 }
