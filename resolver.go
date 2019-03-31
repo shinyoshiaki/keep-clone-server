@@ -93,10 +93,11 @@ func (r *mutationResolver) EditMemo(ctx context.Context, input EditMemo) (*Memo,
 		return nil, nil
 	}
 
-	var m Memo
-	memoDB.Find(&m, "Code = ?", input.MemoCode)
+	memo := memo.Memo{}
+	memo.Code = input.MemoCode
+	memoDB.Find(&memo)
 
-	if m.Owner != owner {
+	if memo.Owner != owner {
 		return nil, nil
 	}
 
@@ -105,18 +106,21 @@ func (r *mutationResolver) EditMemo(ctx context.Context, input EditMemo) (*Memo,
 		tag += v + ","
 	}
 
-	memo := &Memo{
-		Owner: owner,
-		Code:  input.MemoCode,
-		Time:  strconv.FormatInt(time.Now().UTC().Unix(), 10),
-		Title: input.Title,
-		Text:  input.Text,
+	memo.Time = strconv.FormatInt(time.Now().UTC().Unix(), 10)
+	memo.Title = input.Title
+	memo.Text = input.Text
+	memo.Tag = tag
+
+	memoDB.Save(&memo)
+
+	return &Memo{
+		Owner: memo.Owner,
+		Code:  memo.Code,
+		Time:  memo.Time,
+		Title: memo.Title,
+		Text:  memo.Text,
 		Tag:   tag,
-	}
-
-	memoDB.Model(&m).Update(memo)
-
-	return memo, nil
+	}, nil
 }
 
 type queryResolver struct{ *Resolver }
