@@ -48,6 +48,11 @@ type NewUser struct {
 	Password string `json:"password"`
 }
 
+type RemoveMemo struct {
+	Token    string `json:"token"`
+	MemoCode string `json:"memoCode"`
+}
+
 type User struct {
 	Code     string `json:"code"`
 	Name     string `json:"name"`

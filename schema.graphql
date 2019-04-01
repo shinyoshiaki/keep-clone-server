@@ -34,10 +34,16 @@ input EditMemo {
   tag: [String!]!
 }
 
+input RemoveMemo {
+  token: String!
+  memoCode: String!
+}
+
 type Mutation {
   createUser(input: NewUser!): User!
   createMemo(input: NewMemo!): Memo!
   editMemo(input: EditMemo!): Memo!
+  removeMemo(input: RemoveMemo!): Memo!
 }
 
 input GetUser {

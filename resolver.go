@@ -5,7 +5,9 @@ import (
 	"keep-server/model"
 	"keep-server/model/memo"
 	"keep-server/model/user"
-	"keep-server/resolvers"
+	resolvers_editmemo "keep-server/resolvers/editmemo"
+	resolvers_removememo "keep-server/resolvers/removememo"
+
 	"keep-server/session"
 	"keep-server/utill/hash"
 	"log"
@@ -90,13 +92,28 @@ func (r *mutationResolver) CreateMemo(ctx context.Context, input NewMemo) (*Memo
 }
 
 func (r *mutationResolver) EditMemo(ctx context.Context, input EditMemo) (*Memo, error) {
-
-	memo := resolvers.EditMemo(model.EditMemo{
+	memo := resolvers_editmemo.EditMemo(model.EditMemo{
 		input.Token,
 		input.MemoCode,
 		input.Title,
 		input.Text,
 		input.Tag,
+	})
+
+	return &Memo{
+		Owner: memo.Owner,
+		Code:  memo.Code,
+		Time:  memo.Time,
+		Title: memo.Title,
+		Text:  memo.Text,
+		Tag:   memo.Tag,
+	}, nil
+}
+
+func (r *mutationResolver) RemoveMemo(ctx context.Context, input RemoveMemo) (*Memo, error) {
+	memo := resolvers_removememo.RemoveMemo(model.RemoveMemo{
+		Token:    input.Token,
+		MemoCode: input.MemoCode,
 	})
 
 	return &Memo{

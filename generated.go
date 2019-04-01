@@ -58,6 +58,7 @@ type ComplexityRoot struct {
 		CreateMemo func(childComplexity int, input NewMemo) int
 		CreateUser func(childComplexity int, input NewUser) int
 		EditMemo   func(childComplexity int, input EditMemo) int
+		RemoveMemo func(childComplexity int, input RemoveMemo) int
 	}
 
 	Query struct {
@@ -78,6 +79,7 @@ type MutationResolver interface {
 	CreateUser(ctx context.Context, input NewUser) (*User, error)
 	CreateMemo(ctx context.Context, input NewMemo) (*Memo, error)
 	EditMemo(ctx context.Context, input EditMemo) (*Memo, error)
+	RemoveMemo(ctx context.Context, input RemoveMemo) (*Memo, error)
 }
 type QueryResolver interface {
 	GetUser(ctx context.Context, input GetUser) (*User, error)
@@ -184,6 +186,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.EditMemo(childComplexity, args["input"].(EditMemo)), true
+
+	case "Mutation.RemoveMemo":
+		if e.complexity.Mutation.RemoveMemo == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_removeMemo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RemoveMemo(childComplexity, args["input"].(RemoveMemo)), true
 
 	case "Query.Auth":
 		if e.complexity.Query.Auth == nil {
@@ -362,10 +376,16 @@ input EditMemo {
   tag: [String!]!
 }
 
+input RemoveMemo {
+  token: String!
+  memoCode: String!
+}
+
 type Mutation {
   createUser(input: NewUser!): User!
   createMemo(input: NewMemo!): Memo!
   editMemo(input: EditMemo!): Memo!
+  removeMemo(input: RemoveMemo!): Memo!
 }
 
 input GetUser {
@@ -431,6 +451,20 @@ func (ec *executionContext) field_Mutation_editMemo_args(ctx context.Context, ra
 	var arg0 EditMemo
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNEditMemo2keepᚑserverᚐEditMemo(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_removeMemo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 RemoveMemo
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNRemoveMemo2keepᚑserverᚐRemoveMemo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -802,6 +836,40 @@ func (ec *executionContext) _Mutation_editMemo(ctx context.Context, field graphq
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().EditMemo(rctx, args["input"].(EditMemo))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Memo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNMemo2ᚖkeepᚑserverᚐMemo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_removeMemo(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_removeMemo_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RemoveMemo(rctx, args["input"].(RemoveMemo))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2064,6 +2132,30 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, v interfa
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputRemoveMemo(ctx context.Context, v interface{}) (RemoveMemo, error) {
+	var it RemoveMemo
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "token":
+			var err error
+			it.Token, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "memoCode":
+			var err error
+			it.MemoCode, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2175,6 +2267,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "editMemo":
 			out.Values[i] = ec._Mutation_editMemo(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "removeMemo":
+			out.Values[i] = ec._Mutation_removeMemo(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -2583,6 +2680,10 @@ func (ec *executionContext) unmarshalNNewMemo2keepᚑserverᚐNewMemo(ctx contex
 
 func (ec *executionContext) unmarshalNNewUser2keepᚑserverᚐNewUser(ctx context.Context, v interface{}) (NewUser, error) {
 	return ec.unmarshalInputNewUser(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNRemoveMemo2keepᚑserverᚐRemoveMemo(ctx context.Context, v interface{}) (RemoveMemo, error) {
+	return ec.unmarshalInputRemoveMemo(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
