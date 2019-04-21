@@ -41,10 +41,6 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	AllMemo struct {
-		Memos func(childComplexity int) int
-	}
-
 	Memo struct {
 		Code  func(childComplexity int) int
 		Owner func(childComplexity int) int
@@ -83,7 +79,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	GetUser(ctx context.Context, input GetUser) (*User, error)
-	GetAllMemo(ctx context.Context, input GetAllMemo) (*AllMemo, error)
+	GetAllMemo(ctx context.Context, input GetAllMemo) ([]Memo, error)
 	Auth(ctx context.Context, input Auth) (*string, error)
 }
 
@@ -101,13 +97,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
-
-	case "AllMemo.Memos":
-		if e.complexity.AllMemo.Memos == nil {
-			break
-		}
-
-		return e.complexity.AllMemo.Memos(childComplexity), true
 
 	case "Memo.Code":
 		if e.complexity.Memo.Code == nil {
@@ -397,17 +386,13 @@ input GetAllMemo {
   token: String!
 }
 
-type AllMemo {
-  memos: [Memo!]
-}
-
 input Auth {
   token: String!
 }
 
 type Query {
   getUser(input: GetUser!): User
-  getAllMemo(input: GetAllMemo!): AllMemo
+  getAllMemo(input: GetAllMemo!): [Memo!]
   auth(input: Auth!): String
 }
 `},
@@ -560,30 +545,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ***************************** args.gotpl *****************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _AllMemo_memos(ctx context.Context, field graphql.CollectedField, obj *AllMemo) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
-	rctx := &graphql.ResolverContext{
-		Object:   "AllMemo",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Memos, nil
-	})
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]Memo)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOMemo2ᚕkeepᚑserverᚐMemo(ctx, field.Selections, res)
-}
 
 func (ec *executionContext) _Memo_owner(ctx context.Context, field graphql.CollectedField, obj *Memo) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
@@ -939,10 +900,10 @@ func (ec *executionContext) _Query_getAllMemo(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*AllMemo)
+	res := resTmp.([]Memo)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOAllMemo2ᚖkeepᚑserverᚐAllMemo(ctx, field.Selections, res)
+	return ec.marshalOMemo2ᚕkeepᚑserverᚐMemo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_auth(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -2164,30 +2125,6 @@ func (ec *executionContext) unmarshalInputRemoveMemo(ctx context.Context, v inte
 
 // region    **************************** object.gotpl ****************************
 
-var allMemoImplementors = []string{"AllMemo"}
-
-func (ec *executionContext) _AllMemo(ctx context.Context, sel ast.SelectionSet, obj *AllMemo) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, allMemoImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	invalid := false
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AllMemo")
-		case "memos":
-			out.Values[i] = ec._AllMemo_memos(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalid {
-		return graphql.Null
-	}
-	return out
-}
-
 var memoImplementors = []string{"Memo"}
 
 func (ec *executionContext) _Memo(ctx context.Context, sel ast.SelectionSet, obj *Memo) graphql.Marshaler {
@@ -2949,17 +2886,6 @@ func (ec *executionContext) unmarshalN__TypeKind2string(ctx context.Context, v i
 
 func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalString(v)
-}
-
-func (ec *executionContext) marshalOAllMemo2keepᚑserverᚐAllMemo(ctx context.Context, sel ast.SelectionSet, v AllMemo) graphql.Marshaler {
-	return ec._AllMemo(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalOAllMemo2ᚖkeepᚑserverᚐAllMemo(ctx context.Context, sel ast.SelectionSet, v *AllMemo) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._AllMemo(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

@@ -55,16 +55,12 @@ input GetAllMemo {
   token: String!
 }
 
-type AllMemo {
-  memos: [Memo!]
-}
-
 input Auth {
   token: String!
 }
 
 type Query {
   getUser(input: GetUser!): User
-  getAllMemo(input: GetAllMemo!): AllMemo
+  getAllMemo(input: GetAllMemo!): [Memo!]
   auth(input: Auth!): String
 }

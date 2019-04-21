@@ -142,7 +142,7 @@ func (r *queryResolver) GetUser(ctx context.Context, input GetUser) (*User, erro
 	return nil, nil
 }
 
-func (r *queryResolver) GetAllMemo(ctx context.Context, input GetAllMemo) (*AllMemo, error) {
+func (r *queryResolver) GetAllMemo(ctx context.Context, input GetAllMemo) ([]Memo, error) {
 	owner := session.IsLogin(input.Token)
 	if owner == "" {
 		return nil, nil
@@ -153,11 +153,7 @@ func (r *queryResolver) GetAllMemo(ctx context.Context, input GetAllMemo) (*AllM
 
 	log.Println(memos)
 
-	a := &AllMemo{
-		Memos: memos,
-	}
-
-	return a, nil
+	return memos, nil
 }
 
 func (r *queryResolver) Auth(ctx context.Context, input Auth) (*string, error) {

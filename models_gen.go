@@ -2,10 +2,6 @@
 
 package keep_server
 
-type AllMemo struct {
-	Memos []Memo `json:"memos"`
-}
-
 type Auth struct {
 	Token string `json:"token"`
 }
