@@ -13,16 +13,26 @@ type (
 		time time.Time
 		code string
 	}
+	user struct {
+		token string
+	}
 )
 
-var sessions = map[string]*session{}
+var (
+	sessions = map[string]*session{}
+	users    = map[string]*user{}
+)
 
 func Set(token string, code string) {
-	s := &session{
+	exist := users[code]
+	if exist != nil {
+		delete(sessions, exist.token)
+	}
+	sessions[token] = &session{
 		time: time.Now().Add(time.Hour * 1),
 		code: code,
 	}
-	sessions[token] = s
+	users[code] = &user{token: token}
 }
 
 func Get(token string) string {
